@@ -77,7 +77,7 @@ class BestSignSdk
         $post_data['fdata'] = base64_encode($file);
         $post_data['ftype'] = 'pdf';
         $post_data['fname'] = $url;
-        $post_data['fpage'] = $page;
+        $post_data['fpages'] = $page;
         $post_data['fmd5']  = md5_file($file);
 
         $post_data = json_encode($post_data);
@@ -109,6 +109,83 @@ class BestSignSdk
 
         return $response;
 
+    }
+
+    public function addPDFElements($fid, $account, $elements)
+    {
+        $path = "/storage/addPDFElements/";
+
+        $post_data['account']  = $account;
+        $post_data['fid']      = $fid;
+        $post_data['elements'] = $elements;
+
+        $post_data = json_encode($post_data);
+
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick']       = $rtick;
+        $params['signType']    = 'rsa';
+        $params['sign']        = $sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+
+    }
+    public function contractUpdate($account, $url, $page, $title, $expireTime, $description = null)
+    {
+        $path = "/storage/contract/upload/";
+        $file = file_get_contents(config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
+        $post_data['account'] = $account;
+        $post_data['fdata'] = base64_encode($file);
+        $post_data['ftype'] = 'pdf';
+        $post_data['fname'] = $url;
+        $post_data['fpages'] = $page;
+        $post_data['fmd5']  = md5_file($file);
+        $post_data['title'] = $title;
+        $post_data['expireTime'] = $expireTime;
+        $post_data['description'] = $description;
+
+        $post_data = json_encode($post_data);
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
     }
 
     public function downloadSignatureImage($account, $image_name)
