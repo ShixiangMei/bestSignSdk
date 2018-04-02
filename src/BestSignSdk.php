@@ -78,7 +78,7 @@ class BestSignSdk
         $post_data['ftype'] = 'pdf';
         $post_data['fname'] = $url;
         $post_data['fpages'] = $page;
-        $post_data['fmd5']  = md5_file($file);
+        $post_data['fmd5']  = md5($file);
 
         $post_data = json_encode($post_data);
         var_dump($post_data);
