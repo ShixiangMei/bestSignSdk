@@ -169,7 +169,7 @@ class BestSignSdk
      * @param $post_md5：post请求时，body的md5值
      * @return string
      */
-    private function _genSignData($path, $url_params, $rtick, $post_md5)
+    public function _genSignData($path, $url_params, $rtick, $post_md5)
     {
         $request_path = parse_url($this->_host . $path)['path'];
 
