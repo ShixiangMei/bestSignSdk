@@ -72,7 +72,7 @@ class BestSignSdk
     public function signUpdate($user, $url, $page)
     {
         $path = "/storage/upload/";
-        $file = file_get_contents('//'. config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
+        $file = file_get_contents('http://'. config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
         $post_data['account'] = $user->email;
         $post_data['fdata'] = base64_encode($file);
         $post_data['ftype'] = 'pdf';
@@ -150,7 +150,7 @@ class BestSignSdk
     public function contractUpdate($account, $url, $page, $title, $expireTime, $description = null)
     {
         $path = "/storage/contract/upload/";
-        $file = file_get_contents('//' . config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
+        $file = file_get_contents('http://' . config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
         $post_data['account'] = $account;
         $post_data['fdata'] = base64_encode($file);
         $post_data['ftype'] = 'pdf';
