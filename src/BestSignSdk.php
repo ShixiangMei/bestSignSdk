@@ -69,6 +69,48 @@ class BestSignSdk
         return $response;
     }
 
+    public function signUpdate($user, $url, $page)
+    {
+        $path = "/storage/upload/";
+        $file = file_get_contents(config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
+        $post_data['account'] = $user->email;
+        $post_data['fdata'] = base64_encode($file);
+        $post_data['ftype'] = 'pdf';
+        $post_data['fname'] = $url;
+        $post_data['fpage'] = $page;
+        $post_data['fmd5']  = md5_file($file);
+
+        $post_data = json_encode($post_data);
+        var_dump($post_data);
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        var_dump("Request url: " . $url);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+
+    }
+
     public function downloadSignatureImage($account, $image_name)
     {
         $path = "/signatureImage/user/download/";
