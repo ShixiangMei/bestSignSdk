@@ -40,7 +40,6 @@ class BestSignSdk
         $post_data['applyCert'] = $applyCert;
 
         $post_data = json_encode($post_data);
-        var_dump($post_data);
 
         //rtick
         $rtick = time().rand(1000, 9999);
@@ -58,7 +57,6 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
-        var_dump("Request url: " . $url);
 
         //header data
         $header_data = array();
@@ -81,7 +79,6 @@ class BestSignSdk
         $post_data['fmd5']  = md5($file);
 
         $post_data = json_encode($post_data);
-        var_dump($post_data);
 
         //rtick
         $rtick = time().rand(1000, 9999);
@@ -99,7 +96,6 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
-        var_dump("Request url: " . $url);
 
         //header data
         $header_data = array();
@@ -204,7 +200,6 @@ class BestSignSdk
         $sign = $this->getRsaSign($sign_data);
 
         $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
-        var_dump("url: ".$url);
 
         //header data
         $header_data = array();
@@ -229,7 +224,6 @@ class BestSignSdk
         $sign = $this->getRsaSign($sign_data);
 
         $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
-        var_dump("url: ".$url);
 
         //header data
         $header_data = array();
