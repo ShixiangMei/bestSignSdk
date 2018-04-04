@@ -218,7 +218,7 @@ class BestSignSdk
      */
     public function downloadTemplate($fid)
     {
-        $path = "/storage/contract/download/";
+        $path = "/storage/download/";
 
         $url_params['fid'] = $fid;
 
