@@ -210,6 +210,45 @@ class BestSignSdk
         return $response;
     }
 
+    /**
+     * 下载模板文件
+     * User: mei
+     * Date: 2018/4/4 9:28
+     * @param $fid
+     */
+    public function downloadTemplate($fid)
+    {
+        $path = "/storage/contract/download/";
+
+        $url_params['fid'] = $fid;
+
+        //rtick
+        $rtick = time() . rand(1000, 9999);
+
+        //sign
+        $sign_data = $this->_genSignData($path, $url_params, $rtick, null);
+        $sign = $this->getRsaSign($sign_data);
+
+        $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
+        \Log::info('url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('GET', $url, null, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 下载合同文件
+     * User: mei
+     * Date: 2018/4/4 9:33
+     * @param $contractId
+     * @return mixed
+     * @throws \Exception
+     */
     public function downloadContract($contractId)
     {
         $path = "/storage/contract/download/";
@@ -224,6 +263,7 @@ class BestSignSdk
         $sign = $this->getRsaSign($sign_data);
 
         $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
+        \Log::info('url: ' . print_r($url,true));
 
         //header data
         $header_data = array();
