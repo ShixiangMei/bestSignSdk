@@ -67,6 +67,204 @@ class BestSignSdk
         return $response;
     }
 
+    /**
+     * 发送合同
+     * User: mei
+     * Date: 2018/4/7 20:54
+     * @param $contractId
+     * @param $signer
+     * @return mixed
+     * @throws \Exception
+     */
+    public function contractSend($contractId, $signer)
+    {
+        $path = "/contract/send/";
+        $post_data['contractId'] = $contractId;
+        $post_data['signer'] = $signer;
+
+        $post_data = json_encode($post_data);
+        \Log::info('contract_send_data: ' . print_r($post_data,true));
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('contract_send_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 预览页url
+     * User: mei
+     * Date: 2018/4/7 20:53
+     * @param $contractId
+     * @param $account
+     * @return mixed
+     * @throws \Exception
+     */
+    public function contractPreviewURL($contractId, $account)
+    {
+        $path = "/contract/getPreviewURL";
+        $post_data['contractId'] = $contractId;
+        $post_data['account'] = $account;
+
+        $post_data = json_encode($post_data);
+        \Log::info('contract_preview_data: ' . print_r($post_data,true));
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('contract_preview_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 签署合同
+     * User: mei
+     * Date: 2018/4/7 20:06
+     * @param $contractId
+     * @param $signer
+     * @param $signaturePositions
+     * @return mixed
+     * @throws \Exception
+     */
+    public function contractSign($contractId, $signer, $signaturePositions)
+    {
+        $path = "/storage/contract/sign/cert/";
+        $post_data['account'] = $contractId;
+        $post_data['fid'] = $signer;
+        $post_data['expireTime'] = $signaturePositions;
+
+        $post_data = json_encode($post_data);
+        \Log::info('contract_sign_data: ' . print_r($post_data,true));
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('contract_sign_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 创建合同
+     * User: mei
+     * Date: 2018/4/7 20:03
+     * @param $account
+     * @param $fid
+     * @param $expireTime
+     * @param $title
+     * @param null $description
+     * @return mixed
+     * @throws \Exception
+     */
+    public function contractCreate($account, $fid, $expireTime, $title, $description = null)
+    {
+        $path = "/contract/create/";
+        $post_data['account'] = $account;
+        $post_data['fid'] = $fid;
+        $post_data['expireTime'] = $expireTime;
+        $post_data['title'] = $title;
+        $post_data['description'] = $description;
+
+        $post_data = json_encode($post_data);
+        \Log::info('contract_create_data: ' . print_r($post_data,true));
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('contract_create_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 上传合同文件
+     * User: mei
+     * Date: 2018/4/7 19:57
+     * @param $user
+     * @param $url
+     * @param $page
+     * @return mixed
+     * @throws \Exception
+     */
     public function signUpdate($user, $url, $page)
     {
         $path = "/storage/upload/";
@@ -107,6 +305,16 @@ class BestSignSdk
 
     }
 
+    /**
+     * 文件添加描述
+     * User: mei
+     * Date: 2018/4/7 19:56
+     * @param $fid
+     * @param $account
+     * @param $elements
+     * @return mixed
+     * @throws \Exception
+     */
     public function addPDFElements($fid, $account, $elements)
     {
         $path = "/storage/addPDFElements/";
@@ -143,6 +351,19 @@ class BestSignSdk
 
     }
 
+    /**
+     * 上传并创建合同
+     * User: mei
+     * Date: 2018/4/7 19:56
+     * @param $account
+     * @param $url
+     * @param $page
+     * @param $title
+     * @param $expireTime
+     * @param null $description
+     * @return mixed
+     * @throws \Exception
+     */
     public function contractUpdate($account, $url, $page, $title, $expireTime, $description = null)
     {
         $path = "/storage/contract/upload/";
