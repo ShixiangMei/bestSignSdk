@@ -25,6 +25,20 @@ class BestSignSdk
     //********************************************************************************
     // 接口
     //********************************************************************************
+
+    /**
+     * User: mei
+     * Date: 2018/4/8 15:21
+     * @param $account 用户帐号
+     * @param $mail 用户邮箱
+     * @param $mobile 用户手机号
+     * @param $name 用户名称
+     * @param $userType 用户类型(1 代表个人)
+     * @param null $credential 用户证件信息对象
+     * @param string $applyCert 是否申请证书(1 代表申请)
+     * @return mixed
+     * @throws \Exception
+     */
     public function regUser($account, $mail, $mobile, $name, $userType, $credential=null, $applyCert='0')
     {
 
@@ -116,8 +130,8 @@ class BestSignSdk
      * 预览页url
      * User: mei
      * Date: 2018/4/7 20:53
-     * @param $contractId
-     * @param $account
+     * @param $contractId 合同id
+     * @param $account 签约者账号(通常为email)
      * @return mixed
      * @throws \Exception
      */
@@ -161,18 +175,18 @@ class BestSignSdk
      * 签署合同
      * User: mei
      * Date: 2018/4/7 20:06
-     * @param $contractId
-     * @param $signer
-     * @param $signaturePositions
+     * @param $contractId 合同id
+     * @param $signer 签署账号(即签署者的account)
+     * @param $signaturePositions 指定的签署位置，json arra
      * @return mixed
      * @throws \Exception
      */
     public function contractSign($contractId, $signer, $signaturePositions)
     {
         $path = "/storage/contract/sign/cert/";
-        $post_data['account'] = $contractId;
-        $post_data['fid'] = $signer;
-        $post_data['expireTime'] = $signaturePositions;
+        $post_data['contractId'] = $contractId;
+        $post_data['signer'] = $signer;
+        $post_data['signaturePositions'] = $signaturePositions;
 
         $post_data = json_encode($post_data);
         \Log::info('contract_sign_data: ' . print_r($post_data,true));
