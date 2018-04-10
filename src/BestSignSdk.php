@@ -136,6 +136,39 @@ class BestSignSdk
     }
 
     /**
+     * 锁定并结束合同
+     * User: mei
+     * Date: 2018/4/10 13:46
+     * @param $contractId 合同id
+     * @return mixed
+     * @throws \Exception
+     */
+    public function lockContract($contractId)
+    {
+        $path = "/storage/contract/lock/";
+
+        $url_params['contractId'] = $contractId;
+
+        //rtick
+        $rtick = time() . rand(1000, 9999);
+
+        //sign
+        $sign_data = $this->_genSignData($path, $url_params, $rtick, null);
+        $sign = $this->getRsaSign($sign_data);
+
+        $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
+        \Log::info('lock_contract_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('GET', $url, null, $header_data, true);
+
+        return $response;
+    }
+
+    /**
      * 生成印章
      * User: mei
      * Date: 2018/4/10 11:27
