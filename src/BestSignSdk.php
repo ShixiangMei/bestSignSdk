@@ -22,6 +22,19 @@ class BestSignSdk
         $this->_http_utils = new HttpUtils();
     }
 
+    /**
+     * 获得企业社会码json
+     */
+    public function getUifieldCode(){
+        $data =  array(
+            'regcode'=>$this->_credential,
+            'orgcode'=>$this->_credential,
+            'taxcode'=>$this->_credential,
+        );
+        return json_encode($data);
+
+    }
+
     //********************************************************************************
     // 接口
     //********************************************************************************
@@ -50,6 +63,47 @@ class BestSignSdk
         $post_data['name'] = $name;
         $post_data['userType'] = $userType;
         $post_data['account'] = $account;
+        $post_data['credential'] = json_encode($credential);
+        $post_data['applyCert'] = $applyCert;
+
+        $post_data = json_encode($post_data);
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        return json_decode($response);
+    }
+
+    public function regCorUser($account,  $name, $userType, $credential=null, $applyCert='0')
+    {
+
+        $path = "/user/reg/";
+
+        //post data
+//        $post_data['email'] = $mail;
+//        $post_data['mobile'] = $mobile;
+        $post_data['name'] = $name;
+        $post_data['userType'] = $userType;
+        $post_data['account'] = $account;
         $post_data['credential'] = $credential;
         $post_data['applyCert'] = $applyCert;
 
@@ -71,6 +125,56 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 4要素验证
+     * User: mei
+     * Date: 2018/4/9 20:40
+     * @param $name
+     * @param $identity
+     * @param $legalPerson
+     * @param $legalPersonIdentity
+     * @param int $legalPersonIdentityType
+     * @return mixed
+     * @throws \Exception
+     */
+    public function identity4($name, $identity, $legalPerson, $legalPersonIdentity, $legalPersonIdentityType = 0)
+    {
+        $path = "/credentialVerify/enterprise/identity4/";
+        $post_data['name'] = $name;
+        $post_data['identity'] = $identity;
+        $post_data['legalPerson'] = $legalPerson;
+        $post_data['legalPersonIdentity'] = $legalPersonIdentity;
+
+        $post_data = json_encode($post_data);
+        \Log::info('identity4_send_data: ' . print_r($post_data,true));
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('identity4_send_url: ' . print_r($url,true));
 
         //header data
         $header_data = array();
@@ -168,7 +272,7 @@ class BestSignSdk
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
 
-        return $response;
+        return json_decode($response);
     }
 
     /**
@@ -183,6 +287,7 @@ class BestSignSdk
      */
     public function contractSign($contractId, $signer, $signaturePositions)
     {
+
         $path = "/storage/contract/sign/cert/";
         $post_data['contractId'] = $contractId;
         $post_data['signer'] = $signer;
@@ -215,7 +320,7 @@ class BestSignSdk
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
 
-        return $response;
+        return json_decode($response);
     }
 
     /**
@@ -266,8 +371,9 @@ class BestSignSdk
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
 
-        return $response;
+        return json_decode($response);
     }
+
 
     /**
      * 上传合同文件
@@ -279,11 +385,11 @@ class BestSignSdk
      * @return mixed
      * @throws \Exception
      */
-    public function signUpdate($user, $url, $page)
+    public function signUpdate($account, $url, $page)
     {
         $path = "/storage/upload/";
         $file = file_get_contents('http://'. config('oss.bucket') . '.' . config('oss.end_point') . '/' . $url);
-        $post_data['account'] = $user->email;
+        $post_data['account'] = $account;
         $post_data['fdata'] = base64_encode($file);
         $post_data['ftype'] = 'pdf';
         $post_data['fname'] = $url;
