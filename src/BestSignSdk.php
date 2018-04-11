@@ -700,10 +700,12 @@ class BestSignSdk
         //header data
         $header_data = array();
 
-        //content
-        $response = $this->execute('GET', $url, null, $header_data, true);
+        return $url;
 
-        return $response;
+        //content
+//        $response = $this->execute('GET', $url, null, $header_data, true);
+//
+//        return $response;
     }
 
     /**
