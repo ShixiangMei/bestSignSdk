@@ -147,26 +147,35 @@ class BestSignSdk
     {
         $path = "/storage/contract/lock/";
 
-        $url_params['contractId'] = $contractId;
+
+        $post_data['contractId'] = $contractId;
+
+        $post_data = json_encode($post_data);
 
         //rtick
-        $rtick = time() . rand(1000, 9999);
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
 
         //sign
-        $sign_data = $this->_genSignData($path, $url_params, $rtick, null);
         $sign = $this->getRsaSign($sign_data);
 
-        $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
-        \Log::info('lock_contract_url: ' . print_r($url,true));
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
 
         //header data
         $header_data = array();
-
         //content
-        $response = $this->execute('GET', $url, null, $header_data, true);
-
-        return $response;
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        return json_decode($response);
     }
+
 
     /**
      * 生成印章
@@ -270,13 +279,19 @@ class BestSignSdk
      * @return mixed
      * @throws \Exception
      */
-    public function contractSend($contractId, $signer)
+    public function contractSend($contractId, $signer,$signaturePositions,$pushUrl,$returnUrl,$userInfo)
     {
         $path = "/contract/send/";
         $post_data['contractId'] = $contractId;
+        $post_data['signaturePositions'] = $signaturePositions;
         $post_data['signer'] = $signer;
+        $post_data['vcodeMobile'] = $userInfo['mobile'];
+        $post_data['pushUrl'] = $pushUrl;
+        $post_data['returnUrl'] = $returnUrl;
+        $post_data['isDrawSignatureImage'] = '2';//2强制必须手绘签名（只能手写不允许使用默认签名）
 
         $post_data = json_encode($post_data);
+
         \Log::info('contract_send_data: ' . print_r($post_data,true));
 
         //rtick
@@ -303,7 +318,7 @@ class BestSignSdk
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
 
-        return $response;
+        return json_decode($response);
     }
 
     /**
