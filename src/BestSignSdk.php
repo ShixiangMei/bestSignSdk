@@ -708,6 +708,33 @@ class BestSignSdk
 //        return $response;
     }
 
+    public function downloadContract2($contractId)
+    {
+        $path = "/storage/contract/download/";
+
+        $url_params['contractId'] = $contractId;
+
+        //rtick
+        $rtick = time() . rand(1000, 9999);
+
+        //sign
+        $sign_data = $this->_genSignData($path, $url_params, $rtick, null);
+        $sign = $this->getRsaSign($sign_data);
+
+        $url = $this->_getRequestUrl($path, $url_params, $sign, $rtick);
+        \Log::info('url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+
+//        return $url;
+
+        //content
+        $response = $this->execute('GET', $url, null, $header_data, true);
+
+        return $response;
+    }
+
     /**
      * @param $path：接口名
      * @param $url_params: get请求需要放进参数中的参数
