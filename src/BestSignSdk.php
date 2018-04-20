@@ -73,6 +73,7 @@ class BestSignSdk
 
         //sign data
         $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+        \Log::info('regUser_send_data: ' . print_r($post_data,true));
 
         //sign
         $sign = $this->getRsaSign($sign_data);
@@ -84,12 +85,15 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('regUser_url: ' . print_r($url,true));
 
         //header data
         $header_data = array();
 
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        \Log::info('regUser_response: ' . print_r($response,true));
+
         return json_decode($response);
     }
 
@@ -152,6 +156,9 @@ class BestSignSdk
 
         $post_data = json_encode($post_data);
 
+        \Log::info('lockContract_send_data: ' . print_r($post_data,true));
+
+
         //rtick
         $rtick = time().rand(1000, 9999);
 
@@ -168,11 +175,15 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('lockContract_url: ' . print_r($url,true));
+
 
         //header data
         $header_data = array();
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        \Log::info('response: ' . print_r($response,true));
+
         return json_decode($response);
     }
 
