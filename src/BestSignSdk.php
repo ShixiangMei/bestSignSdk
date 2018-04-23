@@ -1,6 +1,7 @@
 <?php
 namespace Msx\BestSignSdk;
 
+use http\Env\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Config\Repository;
 use Msx\BestSignSdk\Helpers\HttpUtils;
@@ -25,11 +26,12 @@ class BestSignSdk
     /**
      * 获得企业社会码json
      */
-    public function getUifieldCode(){
-        $data =  array(
-            'regcode'=>$this->_credential,
-            'orgcode'=>$this->_credential,
-            'taxcode'=>$this->_credential,
+    public function getUifieldCode()
+    {
+        $data = array(
+            'regcode' => $this->_credential,
+            'orgcode' => $this->_credential,
+            'taxcode' => $this->_credential,
         );
         return json_encode($data);
 
@@ -52,7 +54,7 @@ class BestSignSdk
      * @return mixed
      * @throws \Exception
      */
-    public function regUser($account, $mail, $mobile, $name, $userType, $credential=null, $applyCert='0')
+    public function regUser($account, $mail, $mobile, $name, $userType, $credential = null, $applyCert = '0')
     {
 
         $path = "/user/reg/";
@@ -69,35 +71,35 @@ class BestSignSdk
         $post_data = json_encode($post_data);
 
         //rtick
-        $rtick = time().rand(1000, 9999);
+        $rtick = time() . rand(1000, 9999);
 
         //sign data
         $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
-        \Log::info('regUser_send_data: ' . print_r($post_data,true));
+        \Log::info('regUser_send_data: ' . print_r($post_data, true));
 
         //sign
         $sign = $this->getRsaSign($sign_data);
 
-        $params['developerId'] = $this -> _developerId;
+        $params['developerId'] = $this->_developerId;
         $params['rtick'] = $rtick;
         $params['signType'] = 'rsa';
-        $params['sign'] =$sign;
+        $params['sign'] = $sign;
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
-        \Log::info('regUser_url: ' . print_r($url,true));
+        \Log::info('regUser_url: ' . print_r($url, true));
 
         //header data
         $header_data = array();
 
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
-        \Log::info('regUser_response: ' . print_r($response,true));
+        \Log::info('regUser_response: ' . print_r($response, true));
 
         return json_decode($response);
     }
 
-    public function regCorUser($account,  $name, $userType, $credential=null, $applyCert='0')
+    public function regCorUser($account, $name, $userType, $credential = null, $applyCert = '0')
     {
 
         $path = "/user/reg/";
@@ -112,6 +114,52 @@ class BestSignSdk
         $post_data['applyCert'] = $applyCert;
 
         $post_data = json_encode($post_data);
+
+        //rtick
+        $rtick = time() . rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this->_developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] = $sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+
+        //header data
+        $header_data = array();
+
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+
+        return $response;
+    }
+
+    /**
+     * 文件格式转换，只支持从doc, docx转换到PDF，需要转换的文件必须先通过接口【上传合同文件】得到fid
+     * User: mei
+     * Date: 2018/4/23 9:36
+     * @param $account 用户账号
+     * @param $fid 文件id
+     * @param string $ftype 要转换成什么类型，
+     * @return mixed
+     * @throws \Exception
+     */
+    public function convert($account, $fid, $ftype = 'PDF')
+    {
+        $path = "/storage/convert/";
+        $post_data['account'] = $account;
+        $post_data['fid'] = $fid;
+        $post_data['type'] = $ftype;
+
+        $post_data = json_encode($post_data);
+        \Log::info('convert_send_data: ' . print_r($post_data,true));
 
         //rtick
         $rtick = time().rand(1000, 9999);
@@ -129,12 +177,14 @@ class BestSignSdk
 
         //url
         $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('convert_send_url: ' . print_r($url,true));
 
         //header data
         $header_data = array();
 
         //content
         $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        \Log::info('convert_send_response: ' . print_r($response,true));
 
         return $response;
     }
