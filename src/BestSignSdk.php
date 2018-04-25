@@ -142,6 +142,52 @@ class BestSignSdk
     }
 
     /**
+     * 撤销合同
+     * User: mei
+     * Date: 2018/4/25 14:40
+     * @param $contractId 合同id
+     * @return mixed
+     * @throws \Exception
+     */
+    public function cancel($contractId)
+    {
+        $path = "/contract/cancel/";
+
+        $post_data['contractId'] = $contractId;
+
+        $post_data = json_encode($post_data);
+
+        \Log::info('cancel_send_data: ' . print_r($post_data,true));
+
+
+        //rtick
+        $rtick = time().rand(1000, 9999);
+
+        //sign data
+        $sign_data = $this->_genSignData($path, null, $rtick, md5($post_data));
+
+        //sign
+        $sign = $this->getRsaSign($sign_data);
+
+        $params['developerId'] = $this -> _developerId;
+        $params['rtick'] = $rtick;
+        $params['signType'] = 'rsa';
+        $params['sign'] =$sign;
+
+        //url
+        $url = $this->_getRequestUrl($path, null, $sign, $rtick);
+        \Log::info('cancel_url: ' . print_r($url,true));
+
+        //header data
+        $header_data = array();
+        //content
+        $response = $this->execute('POST', $url, $post_data, $header_data, true);
+        \Log::info('cancel_response: ' . print_r($response,true));
+
+        return json_decode($response);
+    }
+
+    /**
      * 文件格式转换，只支持从doc, docx转换到PDF，需要转换的文件必须先通过接口【上传合同文件】得到fid
      * User: mei
      * Date: 2018/4/23 9:36
