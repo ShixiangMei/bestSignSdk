@@ -397,6 +397,7 @@ class BestSignSdk
         $post_data['returnUrl'] = $returnUrl;
         $post_data['version'] = '3'; //签字屏横屏
         $post_data['isDrawSignatureImage'] = '2';//2强制必须手绘签名（只能手写不允许使用默认签名）
+        $post_data['dpi'] = '160';//预览图片清晰度 枚举值：96-低清（默认），120-普清，160-高清，240-超清
 
         $post_data = json_encode($post_data);
 
